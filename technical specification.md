@@ -17,7 +17,7 @@
 |id_membership|INTEGER|FOREIGN KEY -> gym_membership.id, NOT NULL|
 |email|VARCHAR(255)|UNIQUE, NOT NULL|
 
-### gym_membership - членство клуба (абонимент)
+### gym_membership - членство клуба (абонемент)
 |Название поля|Тип|Ограничения|
 |:-|:-:|:-|
 |id|INTEGER|PRIMARY KEY, AUTOINCREMENT|
@@ -26,7 +26,7 @@
 |level|INTEGER|FOREIGN KEY -> levels.id, NOT NULL|
 |status|VARCHAR(255)|NOT NULL, значения: active, expired,cancelled|
 
-### levels - уровень абонимента
+### levels - уровень абонемента
 |Название поля|Тип|Ограничения|
 |:-|:-:|:-|
 |id|INTEGER|PRIMARY KEY, AUTOINCREMENT|
@@ -93,6 +93,15 @@
 |id_class_schedule|INTEGER|FOREIGN KEY -> schedule.id, NOT NULL|
 |id_equipment|INTEGER|FOREIGN KEY -> equipment.id, NOT NULL|
 |quantity|INTEGER|>= 1|
+
+### booking - запись на тренировки
+|Название поля|Тип|Ограничения|
+|:-|:-:|:-|
+|id|SERIAL|PRIMARY KEY|
+|id_client|UUID|FOREIGN KEY -> client.id, NOT NULL|
+|id_schedule|INTEGER|FOREIGN KEY -> schedule.id, NOT NULL|
+|booking_date|TIMESTAMPZ|NOT NULL, DEFAULT NOW()|
+|status|VARCHAR(255)|NOT NULL, значения: confirmed, cancelled, visited, no_show|
 ## Общие ограничения целостности
 - *Клиент должен иметь активную подписку для посещения*
 
@@ -114,9 +123,9 @@
 
     Если last_service + service_interval < CURRENT_DATE — считать оборудование требующим обслуживания
 
-- *Уникальность email*
+- *Клиент не может записаться на занятие дважды*
 
-- *Расписание не может быть без тренера и типа класса*
+- *Если занятие уберут из расписания или уволят тренерра, записи о занятии должны удалиться*
 # Пользовательские роли
 - *Клиент*
 
