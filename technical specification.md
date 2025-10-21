@@ -198,7 +198,7 @@ schedule (1) ←→ (N) equipment_usage - На одном занятии мож�
 ### booking - запись на тренировки
 |Название поля|Тип|Ограничения|
 |:-|:-:|:-|
-|id|SERIAL|PRIMARY KEY|
+|id|UUID|PRIMARY KEY|
 |id_client|UUID|FOREIGN KEY -> client.id, NOT NULL|
 |id_schedule|INTEGER|FOREIGN KEY -> schedule.id, NOT NULL|
 |booking_date|TIMESTAMPZ|NOT NULL, DEFAULT NOW()|
