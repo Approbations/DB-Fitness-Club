@@ -244,3 +244,7 @@ ALTER TABLE "client_visit" ALTER COLUMN "check_in" SET DEFAULT CURRENT_DATE;
 
 ALTER TABLE "booking"
 ADD CONSTRAINT unique_booking_client_schedule UNIQUE ("id_client", "id_schedule");
+
+-- добавление генерации uuid
+ALTER TABLE client
+ALTER COLUMN id SET DEFAULT gen_random_uuid();
