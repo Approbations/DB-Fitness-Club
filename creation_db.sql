@@ -248,3 +248,6 @@ ADD CONSTRAINT unique_booking_client_schedule UNIQUE ("id_client", "id_schedule"
 -- добавление генерации uuid
 ALTER TABLE client
 ALTER COLUMN id SET DEFAULT gen_random_uuid();
+
+ALTER TABLE gym_membership
+ALTER COLUMN id SET DEFAULT gen_random_uuid();

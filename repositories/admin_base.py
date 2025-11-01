@@ -1,13 +1,13 @@
 import psycopg2
 import logging
-from datetime import date
 from typing import Tuple
+from uuid import UUID
 from psycopg2.extras import RealDictCursor
 
 logger = logging.getLogger(__name__)
 
 
-class DataConnection:
+class DataBase:
     def __init__(self):
         self.dbname = "fitness"
         self.user = "postgres"
@@ -53,8 +53,13 @@ class DataConnection:
             logger.error(f"Ошибка в получении данных: {e}")
             return []
 
-    def get_user_by_email(self, email: str):
-        query = f"""SELECT * FROM client WHERE email = '{email}';"""
+
+class DataConnection(DataBase):
+    def get_all_clients(self):
+        return DataBase.get_all_data(self, table="client")
+
+    def get_user_by_id(self, client_id: UUID):
+        query = f"""SELECT * FROM client WHERE id = '{client_id}';"""
 
         try:
             with self._get_connection() as conn:
@@ -67,20 +72,8 @@ class DataConnection:
             logger.error(f"Ошибка в получении данных: {e}")
             return []
 
-    def create_user(self, first_name: str, last_name: str, birth_date: date, email: str):
-        insert_query = f"""INSERT INTO client (first_name, last_name, birth_date, email) VALUES ('{first_name}', '{last_name}', '{birth_date}', '{email}');"""
-
-        try:
-            with self._get_connection() as conn:
-                conn.autocommit = True
-                with conn.cursor() as cur:
-                    cur.execute(insert_query)
-        except Exception as e:
-            logger.error(f"Ошибка при загрузке данных: {e}")
-            raise
-
-    def delete_user(self, email: str):
-        delete_query = f"DELETE FROM client WHERE email = '{email}';"
+    def delete_user(self, client_id: UUID):
+        delete_query = f"DELETE FROM client WHERE id = '{client_id}';"
 
         try:
             with self._get_connection() as conn:
@@ -91,3 +84,32 @@ class DataConnection:
         except Exception as e:
             logger.error(f"Ошибка при удалении документов: {e}")
             raise
+
+    def get_user_memberships(self, client_id: UUID):
+        query = f"""SELECT gym_membership.id, start_date, level, status FROM gym_membership
+                WHERE id_client = '{client_id}';"""
+
+        try:
+            with self._get_connection() as conn:
+                conn.autocommit = True
+                with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                    cur.execute(query)
+                    ans = cur.fetchall()
+                    return ans
+        except psycopg2.Error as e:
+            logger.error(f"Ошибка в получении абонементов: {e}")
+            return []
+
+    def get_client_visit(self, client_id: UUID):
+        query = f"""SELECT * FROM client_visit WHERE id_client = '{client_id}';"""
+
+        try:
+            with self._get_connection() as conn:
+                conn.autocommit = True
+                with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                    cur.execute(query)
+                    ans = cur.fetchall()
+                    return ans
+        except psycopg2.Error as e:
+            logger.error(f"Ошибка в получении данных: {e}")
+            return []
